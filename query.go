@@ -173,12 +173,15 @@ func (conn *Connection) Query(sqlStatements []string) (results []QueryResult, er
 		// time is a float64
 		thisQR.Timing = thisResult["time"].(float64)
 
-		// column & type are an array of strings
-		c := thisResult["columns"].([]interface{})
-		t := thisResult["types"].([]interface{})
-		for i := 0; i < len(c); i++ {
-			thisQR.columns = append(thisQR.columns, c[i].(string))
-			thisQR.types = append(thisQR.types, t[i].(string))
+		// column & type are an array of strings.
+		// those are not present in update queries.
+		if thisResult["columns"] != nil && thisResult["types"] != nil {
+			c := thisResult["columns"].([]interface{})
+			t := thisResult["types"].([]interface{})
+			for i := 0; i < len(c); i++ {
+				thisQR.columns = append(thisQR.columns, c[i].(string))
+				thisQR.types = append(thisQR.types, t[i].(string))
+			}
 		}
 
 		// and values are an array of arrays
